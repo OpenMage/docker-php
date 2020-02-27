@@ -65,9 +65,9 @@ RUN set -xe; \
         --enable-bcmath \
         --enable-sockets \
         --with-xsl \
-        --with-gd \
+        --with-gd=shared \
         --with-password-argon2 \
-        --with-sodium=shared \
+        --with-sodium \
         --with-tidy \
         --with-freetype-dir=/usr/include/ \
         --with-jpeg-dir=shared,/usr/include/ \
@@ -80,7 +80,7 @@ RUN set -xe; \
     make -j "$(nproc)"; \
     make install; \
     docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
-    docker-php-ext-enable opcache igbinary sodium; \
+    docker-php-ext-enable opcache redis igbinary imagick gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
