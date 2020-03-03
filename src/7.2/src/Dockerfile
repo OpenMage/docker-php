@@ -104,9 +104,11 @@ RUN set -xe; \
         echo; \
         echo '[www]'; \
         echo 'listen = 9000'; \
-        echo 'pm.max_children = 10'; \
-        echo 'pm.min_spare_servers = 2'; \
-        echo 'pm.max_spare_servers = 5'; \
+        echo 'pm.max_children = 30'; \
+        echo 'pm.start_servers = 10'; \
+        echo 'pm.min_spare_servers = 10'; \
+        echo 'pm.max_spare_servers = 15'; \
+        echo 'pm.max_requests = 500'; \
         echo 'pm.status_path = /status'; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
@@ -171,7 +173,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync rclone openssh-client"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync rclone openssh-client python3"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
@@ -179,6 +181,12 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
+    cd /tmp; \
+    curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
+    python get-pip.py; \
+    pip install awscli --upgrade; \
+    rm get-pip.py; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]

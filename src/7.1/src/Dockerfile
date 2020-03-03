@@ -172,6 +172,12 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
+    cd /tmp; \
+    curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
+    python get-pip.py; \
+    pip install awscli --upgrade; \
+    rm get-pip.py; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
