@@ -26,6 +26,10 @@ RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements php; \
     ln -fs /etc/alternatives/vi /usr/bin/vim; \
+    mkdir -p /tmp/mhsendmail; \
+    cd /tmp/mhsendmail; \
+    docker-package-download -o /usr/local/bin/mhsendmail "https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64"; \
+    chmod +x /usr/local/bin/mhsendmail; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
     docker-php-source extract; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
@@ -105,7 +109,7 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_BLACKFIRE_VERSION="1.31.0"
-ARG PHP_EXT_NEWRELIC_VERSION="9.7.0.258"
+ARG PHP_EXT_NEWRELIC_VERSION="9.9.0.260"
 ARG PHP_EXT_TIDEWAYS_VERSION="5.0.58"
 
 ## configure php extensions
@@ -123,7 +127,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/newrelic; \
     cd /tmp/newrelic; \
-	docker-package-download -o newrelic.tar.gz -s "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz"; \
+	docker-package-download -o newrelic.tar.gz -s "https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz"; \
     tar --strip 1 -xzf newrelic.tar.gz; \
     cp "agent/$(uname -m | grep -oE '(x?[0-9]+)' | head -1)/newrelic-$(phpize -v | grep Zend\ M | grep -oE '([0-9]+)').so" "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
@@ -164,7 +168,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync rclone openssh-client vim.tiny python3"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
@@ -178,6 +182,7 @@ RUN set -xe; \
     python get-pip.py; \
     pip install awscli --upgrade; \
     rm get-pip.py; \
+    curl https://rclone.org/install.sh | bash;\
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
