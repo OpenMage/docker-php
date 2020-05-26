@@ -19,7 +19,8 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_INI_DIR="/usr/local/etc/php" \
     PHP_SRC_DIR="/usr/src/php" \
     PHP_SRC_FILE="/usr/src/php.tar.gz" \
-    PHPIZE_BUILD_REQUIREMENTS="build-essential automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libltdl-dev"
+    PHPIZE_BUILD_REQUIREMENTS="build-essential automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libltdl-dev" \
+    DOCUMENT_ROOT="/var/www/html"
 
 ### configure php
 RUN set -xe; \
