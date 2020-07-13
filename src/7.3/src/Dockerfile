@@ -169,7 +169,7 @@ RUN set -xe; \
     chmod +x /usr/local/bin/magerun2; \
     /usr/local/bin/docker-layer-clean
 
-VOLUME ["/var/www/"]
+#VOLUME ["/var/www/"]
 WORKDIR /var/www/html
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
