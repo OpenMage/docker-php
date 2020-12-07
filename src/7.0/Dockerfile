@@ -28,17 +28,17 @@ RUN set -xe; \
     /usr/local/bin/docker-php-source-prepare; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
     docker-php-source extract; \
-	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-	if [[ ! -d "/usr/include/curl" ]]; then \
-	    ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
-	fi; \
+    gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+    debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
+    if [[ ! -d "/usr/include/curl" ]]; then \
+        ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
+    fi; \
     cd /usr/src/php; \
-	export \
-		CFLAGS="$PHP_CFLAGS" \
-		CPPFLAGS="$PHP_CPPFLAGS" \
-		LDFLAGS="$PHP_LDFLAGS" \
-	; \
+    export \
+        CFLAGS="$PHP_CFLAGS" \
+        CPPFLAGS="$PHP_CPPFLAGS" \
+        LDFLAGS="$PHP_LDFLAGS" \
+    ; \
     ./configure \
         --build="$gnuArch" \
         --with-config-file-path="$PHP_INI_DIR" \
@@ -130,7 +130,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/ioncube; \
     cd /tmp/ioncube; \
-	docker-package-download -o ioncube.tar.gz -s https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz; \
+    docker-package-download -o ioncube.tar.gz -s https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz; \
     tar --strip 1 -xzf ioncube.tar.gz; \
     cp "ioncube_loader_lin_$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/ioncube.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/ioncube.so"; \
@@ -139,7 +139,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/newrelic; \
     cd /tmp/newrelic; \
-	docker-package-download -o newrelic.tar.gz -s https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION:-8.5.0.235}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION:-8.5.0.235}-linux.tar.gz; \
+    docker-package-download -o newrelic.tar.gz -s https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION:-8.5.0.235}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION:-8.5.0.235}-linux.tar.gz; \
     tar --strip 1 -xzf newrelic.tar.gz; \
     cp "agent/$(uname -m | grep -oE '(x?[0-9]+)' | head -1)/newrelic-$(phpize -v | grep Zend\ M | grep -oE '([0-9]+)').so" "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \

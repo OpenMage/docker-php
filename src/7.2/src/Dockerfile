@@ -39,17 +39,17 @@ RUN set -xe; \
     make install PREFIX=/usr; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
     docker-php-source extract; \
-	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-	debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-	if [[ ! -d "/usr/include/curl" ]]; then \
-	    ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
-	fi; \
+    gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+    debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
+    if [[ ! -d "/usr/include/curl" ]]; then \
+        ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
+    fi; \
     cd /usr/src/php; \
-	export \
-		CFLAGS="$PHP_CFLAGS" \
-		CPPFLAGS="$PHP_CPPFLAGS" \
-		LDFLAGS="$PHP_LDFLAGS" \
-	; \
+    export \
+        CFLAGS="$PHP_CFLAGS" \
+        CPPFLAGS="$PHP_CPPFLAGS" \
+        LDFLAGS="$PHP_LDFLAGS" \
+    ; \
     ./configure \
         --build="$gnuArch" \
         --with-config-file-path="$PHP_INI_DIR" \
@@ -137,7 +137,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/newrelic; \
     cd /tmp/newrelic; \
-	docker-package-download -o newrelic.tar.gz -s "https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz"; \
+    docker-package-download -o newrelic.tar.gz -s "https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz"; \
     tar --strip 1 -xzf newrelic.tar.gz; \
     cp "agent/$(uname -m | grep -oE '(x?[0-9]+)' | head -1)/newrelic-$(phpize -v | grep Zend\ M | grep -oE '([0-9]+)').so" "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
@@ -146,7 +146,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/tideways; \
     cd /tmp/tideways; \
- 	docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
+    docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
     tar --strip 2 -xzf tideways.tar.gz; \
     ls -lisah; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
@@ -158,6 +158,11 @@ RUN set -xe; \
     COMPOSER_DOWNLOAD_LATEST=$(curl -s curl -s https://api.github.com/repos/composer/composer/releases/latest | grep "browser_download_url.*phar" | cut -d '"' -f 4) ; \
     docker-package-download -o /usr/local/bin/composer ${COMPOSER_DOWNLOAD_LATEST}; \
     chmod +x /usr/local/bin/composer; \
+    ################################################
+    ## install Composer 1 for Magento 2
+    ################################################
+    docker-package-download -o /usr/local/bin/composer1 https://getcomposer.org/composer-1.phar; \
+    chmod +x /usr/local/bin/composer1; \
     ################################################
     ## install magerun
     ################################################
