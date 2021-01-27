@@ -195,7 +195,7 @@ RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
-    pip install awscli --upgrade; \
+    pip3 install awscli --upgrade; \
     curl https://rclone.org/install.sh | bash;\
     /usr/local/bin/docker-layer-clean
 
