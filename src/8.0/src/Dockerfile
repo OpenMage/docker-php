@@ -1,16 +1,16 @@
-FROM openmage/php-base:stretch-latest AS php
+FROM openmage/php-base:buster-latest AS php
 
 COPY FS /
 
-ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libfreetype6 libltdl7 libmcrypt4  libpng16-16 libzip4 libfcgi-bin libtidy5 cron vim.tiny"
+ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny"
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
-ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl1.0-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev"
+ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
-ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-2.8.0 redis-5.1.1 igbinary-3.1.2 APCu-5.1.18"
+ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1 APCu-5.1.19"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="7.1"
+ARG PHP_VERSION="8.0"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -20,17 +20,27 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_SRC_DIR="/usr/src/php" \
     PHP_SRC_FILE="/usr/src/php.tar.gz" \
     PHPIZE_BUILD_REQUIREMENTS="build-essential automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libltdl-dev" \
-    DOCUMENT_ROOT="/var/www/html"
+    DOCUMENT_ROOT="/var/www/html" \
+    PHP_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz" \
+    PHP_ASC_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc"
 
 ### configure php
 RUN set -xe; \
     \
+    chmod 755 /usr/local/bin/docker-entrypoint; \
     /usr/local/bin/docker-install-requirements php; \
     ln -fs /etc/alternatives/vi /usr/bin/vim; \
     mkdir -p /tmp/mhsendmail; \
     cd /tmp/mhsendmail; \
-    docker-package-download -o /usr/local/bin/mhsendmail "https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64"; \
+    curl -LkSso /usr/local/bin/mhsendmail 'https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64'&& \
+    chmod 0755 /usr/local/bin/mhsendmail; \
     chmod +x /usr/local/bin/mhsendmail; \
+    mkdir -p /tmp/argon2; \
+    cd /tmp/argon2; \
+    curl -o argon2.tar.gz -s https://codeload.github.com/P-H-C/phc-winner-argon2/tar.gz/20190702; \
+    tar --strip 1 -xf argon2.tar.gz; \
+    make -j$(nproc); \
+    make install PREFIX=/usr; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
     docker-php-source extract; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
@@ -39,7 +49,7 @@ RUN set -xe; \
         ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
     fi; \
     cd /usr/src/php; \
-        export \
+    export \
         CFLAGS="$PHP_CFLAGS" \
         CPPFLAGS="$PHP_CPPFLAGS" \
         LDFLAGS="$PHP_LDFLAGS" \
@@ -50,27 +60,29 @@ RUN set -xe; \
         --with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
         --enable-option-checking=fatal \
         --disable-cgi \
-        --with-pdo-mysql=mysqlnd \
         --enable-mysqlnd \
-        --with-mcrypt \
-        --with-mhash \
         --enable-ftp \
         --enable-mbstring \
+        --enable-exif \
+        --enable-bcmath \
+        --enable-sockets \
+        --enable-gd=shared \
+        --with-pdo-mysql=mysqlnd \
+        --with-mhash \
         --with-curl \
         --with-libedit \
         --with-openssl \
         --with-zlib \
-        --enable-zip \
-        --enable-exif \
-        --enable-bcmath \
-        --enable-sockets \
-        --with-xsl \
-        --with-gd \
+        --with-zip \
+        --with-pear \
         --with-tidy \
-        --with-freetype-dir=/usr/include/ \
-        --with-jpeg-dir=shared,/usr/include/ \
-        --with-webp-dir=/usr/include/ \
-        --with-png-dir=/usr/include/ \
+        --with-sodium \
+        --with-xsl \
+        --with-password-argon2 \
+        --with-freetype \
+        --with-jpeg \
+        --with-mysqli=mysqlnd \
+        --with-gmp \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
@@ -78,7 +90,7 @@ RUN set -xe; \
     make -j "$(nproc)"; \
     make install; \
     docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
-    docker-php-ext-enable opcache igbinary; \
+    docker-php-ext-enable opcache redis igbinary imagick gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
@@ -109,9 +121,9 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_BLACKFIRE_VERSION="1.31.0"
-ARG PHP_EXT_NEWRELIC_VERSION="9.9.0.260"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.0.58"
+ARG PHP_EXT_BLACKFIRE_VERSION="1.45.1"
+ARG PHP_EXT_NEWRELIC_VERSION="9.16.0.295"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.3.8"
 
 ## configure php extensions
 RUN set -xe; \
@@ -128,10 +140,11 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/newrelic; \
     cd /tmp/newrelic; \
-    docker-package-download -o newrelic.tar.gz -s "https://download.newrelic.com/php_agent/archive/${PHP_EXT_NEWRELIC_VERSION}/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz"; \
-    tar --strip 1 -xzf newrelic.tar.gz; \
-    cp "agent/$(uname -m | grep -oE '(x?[0-9]+)' | head -1)/newrelic-$(phpize -v | grep Zend\ M | grep -oE '([0-9]+)').so" "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
-    ls -lisah "$(/usr/local/bin/php-config --extension-dir)/newrelic.so"; \
+    curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
+    export NR_INSTALL_USE_CP_NOT_LN=1; \
+    export NR_INSTALL_SILENT=1; \
+    /tmp/newrelic-php5-*/newrelic-install install; \
+    rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
     ################################################
     ## install tideways
     ################################################
@@ -173,7 +186,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
