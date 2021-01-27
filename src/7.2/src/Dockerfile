@@ -60,29 +60,28 @@ RUN set -xe; \
         --with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
         --enable-option-checking=fatal \
         --disable-cgi \
+        --with-pdo-mysql=mysqlnd \
         --enable-mysqlnd \
+        --with-mhash \
         --enable-ftp \
         --enable-mbstring \
-        --enable-exif \
-        --enable-bcmath \
-        --enable-sockets \
-        --enable-gd=shared \
-        --with-pdo-mysql=mysqlnd \
-        --with-mhash \
         --with-curl \
         --with-libedit \
         --with-openssl \
         --with-zlib \
-        --with-zip \
-        --with-pear \
-        --with-tidy \
-        --with-sodium \
+        --enable-zip \
+        --enable-exif \
+        --enable-bcmath \
+        --enable-sockets \
         --with-xsl \
+        --with-gd=shared \
         --with-password-argon2 \
-        --with-freetype \
-        --with-jpeg \
-        --with-mysqli=mysqlnd \
-        --with-gmp \
+        --with-sodium \
+        --with-tidy \
+        --with-freetype-dir=/usr/include/ \
+        --with-jpeg-dir=shared,/usr/include/ \
+        --with-webp-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
