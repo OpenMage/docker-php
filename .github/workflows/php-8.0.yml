@@ -1,4 +1,4 @@
-name: "7.4"
+name: "8.0"
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         version: [8.0]
-        patchVersion: [0]
+        patchVersion: [0,1]
     steps:
       - uses: actions/checkout@v1
 
