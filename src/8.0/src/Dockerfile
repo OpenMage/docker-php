@@ -195,11 +195,7 @@ RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
-    cd /tmp; \
-    curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
-    python get-pip.py; \
     pip install awscli --upgrade; \
-    rm get-pip.py; \
     curl https://rclone.org/install.sh | bash;\
     /usr/local/bin/docker-layer-clean
 
