@@ -1,4 +1,4 @@
-FROM openmage/php-base:buster-latest AS php
+FROM openmage/php-base:stretch-latest AS php
 
 COPY FS /
 
@@ -78,7 +78,7 @@ RUN set -xe; \
         --with-password-argon2 \
         --with-sodium \
         --with-tidy \
-        --with-freetype \
+        --with-freetype-dir=/usr/include/ \
         --with-jpeg-dir=shared,/usr/include/ \
         --with-webp-dir=/usr/include/ \
         --with-png-dir=/usr/include/ \
