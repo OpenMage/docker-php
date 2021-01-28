@@ -184,6 +184,7 @@ ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 EXPOSE 9000
 
+
 FROM php AS toolbox
 
 ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils python3-pip"
@@ -194,9 +195,10 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
-    pip3 install awscli --upgrade; \
-    curl https://rclone.org/install.sh | bash;\
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    unzip awscliv2.zip; \
+    ./aws/install; \
+    curl https://rclone.org/install.sh | bash; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
