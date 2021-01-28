@@ -1,10 +1,10 @@
-FROM openmage/php-base:buster-latest AS php
+FROM openmage/php-base:stretch-latest AS php
 
 COPY FS /
 
-ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny"
+ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libfreetype6 libltdl7 libmcrypt4 libpng16-16 libzip4 libfcgi-bin libtidy5 libsodium23 cron vim.tiny"
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
-ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev"
+ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl1.0-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
 ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1 APCu-5.1.19"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
@@ -60,29 +60,28 @@ RUN set -xe; \
         --with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
         --enable-option-checking=fatal \
         --disable-cgi \
+        --with-pdo-mysql=mysqlnd \
         --enable-mysqlnd \
+        --with-mhash \
         --enable-ftp \
         --enable-mbstring \
-        --enable-exif \
-        --enable-bcmath \
-        --enable-sockets \
-        --enable-gd=shared \
-        --with-pdo-mysql=mysqlnd \
-        --with-mhash \
         --with-curl \
         --with-libedit \
         --with-openssl \
         --with-zlib \
-        --with-zip \
-        --with-pear \
-        --with-tidy \
-        --with-sodium \
+        --enable-zip \
+        --enable-exif \
+        --enable-bcmath \
+        --enable-sockets \
         --with-xsl \
+        --with-gd=shared \
         --with-password-argon2 \
-        --with-freetype \
-        --with-jpeg \
-        --with-mysqli=mysqlnd \
-        --with-gmp \
+        --with-sodium \
+        --with-tidy \
+        --with-freetype-dir=/usr/include/ \
+        --with-jpeg-dir=shared,/usr/include/ \
+        --with-webp-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
@@ -186,7 +185,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-pip"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
@@ -194,13 +193,10 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
-    cd /tmp; \
-    curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
-    python get-pip.py; \
-    pip install awscli --upgrade; \
-    rm get-pip.py; \
-    curl https://rclone.org/install.sh | bash;\
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    unzip awscliv2.zip; \
+    ./aws/install; \
+    curl https://rclone.org/install.sh | bash; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]

@@ -6,7 +6,7 @@ ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libg
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
-ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1 APCu-5.1.19"
+ARG PHP_PECL_REQUIREMENTS="xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1 APCu-5.1.19"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
@@ -90,7 +90,7 @@ RUN set -xe; \
     make -j "$(nproc)"; \
     make install; \
     docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
-    docker-php-ext-enable opcache redis igbinary imagick gd; \
+    docker-php-ext-enable opcache redis igbinary gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
@@ -186,7 +186,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils python3-pip"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
@@ -194,13 +194,10 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3 0; \
-    cd /tmp; \
-    curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
-    python get-pip.py; \
-    pip install awscli --upgrade; \
-    rm get-pip.py; \
-    curl https://rclone.org/install.sh | bash;\
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    unzip awscliv2.zip; \
+    ./aws/install; \
+    curl https://rclone.org/install.sh | bash; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
