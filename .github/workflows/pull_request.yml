@@ -8,52 +8,10 @@ jobs:
   lint:
     strategy:
       matrix:
-        distribution: [stretch, buster]
+        version: ['7.2', '7.3', '7.4', '8.0' ]
     runs-on: ubuntu-latest
     container: pipelinecomponents/hadolint:latest
     steps:
     - uses: actions/checkout@v1
-    - name: Run hadolint Debian ${{ matrix.distribution }}
-      run: hadolint src/Dockerfile-${{ matrix.distribution }}
-  
-  build:
-    runs-on: ubuntu-latest
-    needs: ['lint']
-    strategy:
-      matrix:
-        distribution: [stretch, buster]
-    steps:
-    - uses: actions/checkout@v1
-    
-    - name: Build Docker image
-      run: docker build -t debian-${{ matrix.distribution }}:${{github.sha}} -f src/Dockerfile-${{ matrix.distribution }} src
-    
-    - name: Save Docker image artifact
-      run: docker save -o build-${{ matrix.distribution }}.tar debian-${{ matrix.distribution }}:${{github.sha}}
-    
-    - name: Upload image artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: action-image
-        path: build-${{ matrix.distribution }}.tar
-  
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: ['build']
-    strategy:
-      matrix:
-        distribution: [stretch, buster]
-    steps:
-    - uses: actions/checkout@v1
-    - name: Pull Image artifact
-      uses: actions/download-artifact@master
-      with:
-        name: action-image
-    - name: Load image into docker context
-      run: docker load -i action-image/build-${{ matrix.distribution }}.tar
-    - name: Run Structure tests
-      uses: brpaz/structure-tests-action@master
-      with:
-        configFile: .container-structure-test.yaml
-        image: debian-${{ matrix.distribution }}:${{github.sha}}
+    - name: Run hadolint
+      run: hadolint src/${{ matrix.version }}/src/Dockerfile
