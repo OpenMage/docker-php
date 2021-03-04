@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="7.3.25"
+ARG PHP_VERSION="7.3"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
