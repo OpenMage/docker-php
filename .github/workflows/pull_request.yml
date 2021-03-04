@@ -15,5 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run hadolint
-      shell: /bin/ash
+      shell: ash  {0}
       run: hadolint src/${{ matrix.version }}/src/Dockerfile
