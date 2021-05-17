@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'src/8.0/**'
       - '.github/workflows/php-8.0.yml'
@@ -28,13 +28,13 @@ jobs:
         run: docker build --target toolbox -t openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox -f src/${{ matrix.version }}/src/Dockerfile --build-arg PHP_VERSION=${{ matrix.version }}.${{ matrix.patchVersion }} src/${{ matrix.version }}/src/
 
       - uses: azure/docker-login@v1
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: publish php image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}
       - name: publish toolbox image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox
