@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'src/7.2/**'
       - '.github/workflows/php-7.2.yml'
@@ -28,15 +28,15 @@ jobs:
         run: docker build --target toolbox -t openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox -f src/${{ matrix.version }}/src/Dockerfile --build-arg PHP_VERSION=${{ matrix.version }}.${{ matrix.patchVersion }} src/${{ matrix.version }}/src/
 
       - uses: azure/docker-login@v1
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: publish php image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}
       - name: publish toolbox image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox
 
 #  test:
@@ -49,19 +49,19 @@ jobs:
 #    steps:
 #    - uses: actions/checkout@v1
 #    - name: Pull Image artifact
-#      uses: actions/download-artifact@master
+#      uses: actions/download-artifact@main
 #      with:
 #        name: action-image
 #    - name: Load image into docker context
 #      run: docker load -i action-image/build-${{ matrix.distribution }}.tar
 #    - name: Run Structure tests
-#      uses: brpaz/structure-tests-action@master
+#      uses: brpaz/structure-tests-action@main
 #      with:
 #        configFile: .container-structure-test.yaml
 #        image: debian-${{ matrix.distribution }}:${{github.sha}}
 #
 #  release:
-#    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 #    name: Release
 #    runs-on: ubuntu-latest
 #    strategy:
@@ -74,7 +74,7 @@ jobs:
 #        with:
 #          username: ${{ secrets.DOCKER_USERNAME }}
 #          password: ${{ secrets.DOCKER_PASSWORD }}
-#      - uses: actions/download-artifact@master
+#      - uses: actions/download-artifact@main
 #        name: Pull Image artifact
 #        with:
 #          name: action-image

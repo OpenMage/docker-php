@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'src/7.4/**'
       - '.github/workflows/php-7.4.yml'
@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         version: [7.4]
-        patchVersion: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        patchVersion: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18]
     steps:
       - uses: actions/checkout@v1
 
@@ -28,13 +28,13 @@ jobs:
         run: docker build --target toolbox -t openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox -f src/${{ matrix.version }}/src/Dockerfile --build-arg PHP_VERSION=${{ matrix.version }}.${{ matrix.patchVersion }} src/${{ matrix.version }}/src/
 
       - uses: azure/docker-login@v1
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: publish php image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}
       - name: publish toolbox image to dockerhub
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: docker push openmage/php:${{ matrix.version }}.${{ matrix.patchVersion }}-toolbox
