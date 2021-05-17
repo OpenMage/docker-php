@@ -121,7 +121,7 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_BLACKFIRE_VERSION="1.45.1"
-ARG PHP_EXT_NEWRELIC_VERSION="9.16.0.295"
+ARG PHP_EXT_NEWRELIC_VERSION="9.17.1.301"
 ARG PHP_EXT_TIDEWAYS_VERSION="5.3.8"
 
 ## configure php extensions
