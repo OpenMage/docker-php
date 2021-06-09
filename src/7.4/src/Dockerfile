@@ -157,16 +157,18 @@ RUN set -xe; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
     docker-php-source delete; \
     ################################################
-    ## install Composer
+    ## install Composer 2 as default
     ################################################
-    COMPOSER_DOWNLOAD_LATEST=$(curl -s curl -s https://api.github.com/repos/composer/composer/releases/latest | grep "browser_download_url.*phar" | cut -d '"' -f 4) ; \
+    COMPOSER_DOWNLOAD_LATEST=$(curl -s https://api.github.com/repos/composer/composer/releases/latest | grep "browser_download_url.*phar" | cut -d '"' -f 4) ; \
     docker-package-download -o /usr/local/bin/composer ${COMPOSER_DOWNLOAD_LATEST}; \
     chmod +x /usr/local/bin/composer; \
+    composer selfupdate; \
     ################################################
-    ## install Composer 1 for Magento 2
+    ## install Composer 1
     ################################################
     docker-package-download -o /usr/local/bin/composer1 https://getcomposer.org/composer-1.phar; \
     chmod +x /usr/local/bin/composer1; \
+    composer1 selfupdate; \
     ################################################
     ## install magerun
     ################################################
