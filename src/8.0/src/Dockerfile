@@ -71,6 +71,7 @@ RUN set -xe; \
         --with-mhash \
         --with-curl \
         --with-libedit \
+        --enable-pcntl \
         --with-openssl \
         --with-zlib \
         --with-zip \

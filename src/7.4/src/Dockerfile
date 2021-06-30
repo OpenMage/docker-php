@@ -78,6 +78,7 @@ RUN set -xe; \
         --with-tidy \
         --with-sodium \
         --with-xsl \
+        --enable-pcntl \
         --with-password-argon2 \
         --with-freetype \
         --with-jpeg \

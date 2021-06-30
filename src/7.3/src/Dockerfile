@@ -74,6 +74,7 @@ RUN set -xe; \
         --enable-bcmath \
         --enable-sockets \
         --with-xsl \
+        --enable-pcntl \
         --with-gd=shared \
         --with-password-argon2 \
         --with-sodium \
