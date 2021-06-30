@@ -78,6 +78,7 @@ RUN set -xe; \
         --with-password-argon2 \
         --with-sodium \
         --with-tidy \
+        --enable-pcntl \
         --with-freetype-dir=/usr/include/ \
         --with-jpeg-dir=shared,/usr/include/ \
         --with-webp-dir=/usr/include/ \
