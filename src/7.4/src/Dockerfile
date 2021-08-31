@@ -122,20 +122,28 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_BLACKFIRE_VERSION="1.45.1"
-ARG PHP_EXT_NEWRELIC_VERSION="9.17.1.301"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.3.8"
+ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
+ARG BLACKFIRE_CLIENT_ID="~"
+ARG BLACKFIRE_CLIENT_TOKEN="~"
+ARG BLACKFIRE_SERVER_ID="~"
+ARG BLACKFIRE_SERVER_TOKEN="~"
 
 ## configure php extensions
 RUN set -xe; \
     \
     ################################################
     ## install blackfire
-    ################################################
+    ################################################ \
     mkdir -p /tmp/blackfire; \
     cd /tmp/blackfire; \
-    docker-package-download -o blackfire.so -A "Docker" -D - -L -s "https://packages.blackfire.io/binaries/blackfire-php/${PHP_EXT_BLACKFIRE_VERSION}/blackfire-php-linux_amd64-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2 | tr -d '.').so"; \
-    cp blackfire.so "$(/usr/local/bin/php-config --extension-dir)/blackfire.so"; \
+    export \
+            BLACKFIRE_CLIENT_ID="${CLIENT_ID}" \
+            BLACKFIRE_CLIENT_TOKEN="${CLIENT_TOKEN}" \
+            BLACKFIRE_SERVER_ID="${SERVER_ID}" \
+            BLACKFIRE_SERVER_TOKEN="${SERVER_TOKEN}" \
+        ; \
+    bash -c "$(curl -L https://installer.blackfire.io/installer.sh)"
     ################################################
     ## install newrelic
     ################################################
@@ -198,9 +206,6 @@ ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
-    unzip awscliv2.zip; \
-    ./aws/install; \
     curl https://rclone.org/install.sh | bash; \
     /usr/local/bin/docker-layer-clean
 
