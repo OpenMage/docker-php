@@ -137,10 +137,10 @@ RUN set -xe; \
     mkdir -p /tmp/blackfire; \
     cd /tmp/blackfire; \
     export \
-            BLACKFIRE_CLIENT_ID="${CLIENT_ID}" \
-            BLACKFIRE_CLIENT_TOKEN="${CLIENT_TOKEN}" \
-            BLACKFIRE_SERVER_ID="${SERVER_ID}" \
-            BLACKFIRE_SERVER_TOKEN="${SERVER_TOKEN}" \
+            BLACKFIRE_CLIENT_ID="${BLACKFIRE_CLIENT_ID}" \
+            BLACKFIRE_CLIENT_TOKEN="${BLACKFIRE_CLIENT_TOKEN}" \
+            BLACKFIRE_SERVER_ID="${BLACKFIRE_SERVER_ID}" \
+            BLACKFIRE_SERVER_TOKEN="${BLACKFIRE_SERVER_TOKEN}" \
         ; \
     bash -c "$(curl -L https://installer.blackfire.io/installer.sh)"; \
     ################################################
