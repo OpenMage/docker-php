@@ -123,26 +123,10 @@ RUN set -xe; \
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
 ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
-ARG BLACKFIRE_CLIENT_ID="~"
-ARG BLACKFIRE_CLIENT_TOKEN="~"
-ARG BLACKFIRE_SERVER_ID="~"
-ARG BLACKFIRE_SERVER_TOKEN="~"
 
 ## configure php extensions
 RUN set -xe; \
     \
-    ################################################
-    ## install blackfire
-    ################################################
-    mkdir -p /tmp/blackfire; \
-    cd /tmp/blackfire; \
-    export \
-            BLACKFIRE_CLIENT_ID="${BLACKFIRE_CLIENT_ID}" \
-            BLACKFIRE_CLIENT_TOKEN="${BLACKFIRE_CLIENT_TOKEN}" \
-            BLACKFIRE_SERVER_ID="${BLACKFIRE_SERVER_ID}" \
-            BLACKFIRE_SERVER_TOKEN="${BLACKFIRE_SERVER_TOKEN}" \
-        ; \
-    bash -c "$(curl -L https://installer.blackfire.io/installer.sh)"; \
     ################################################
     ## install newrelic
     ################################################
