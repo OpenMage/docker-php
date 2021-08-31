@@ -143,7 +143,7 @@ RUN set -xe; \
             BLACKFIRE_SERVER_ID="${SERVER_ID}" \
             BLACKFIRE_SERVER_TOKEN="${SERVER_TOKEN}" \
         ; \
-    bash -c "$(curl -L https://installer.blackfire.io/installer.sh)"
+    bash -c "$(curl -L https://installer.blackfire.io/installer.sh)"; \
     ################################################
     ## install newrelic
     ################################################
