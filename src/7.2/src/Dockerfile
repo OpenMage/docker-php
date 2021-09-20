@@ -1,4 +1,4 @@
-FROM openmage/php-base:stretch-latest AS php
+FROM openmage/php-base:bullseye-latest AS php
 
 COPY FS /
 
