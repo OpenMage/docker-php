@@ -2,11 +2,11 @@ FROM openmage/php-base:bullseye-latest AS php
 
 COPY FS /
 
-ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny"
+ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny php-xdebug"
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
-ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev gnupg2"
+ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev gnupg2 argon2 libargon2-0 libargon2-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
-ARG PHP_PECL_REQUIREMENTS="xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1 APCu-5.1.19"
+ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
@@ -22,7 +22,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHPIZE_BUILD_REQUIREMENTS="build-essential automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libltdl-dev" \
     DOCUMENT_ROOT="/var/www/html" \
     PHP_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz" \
-    PHP_ASC_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc"
+    IMAGICK_VERSION="3.5.1"
 
 ### configure php
 RUN set -xe; \
@@ -35,13 +35,10 @@ RUN set -xe; \
     curl -LkSso /usr/local/bin/mhsendmail 'https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64'&& \
     chmod 0755 /usr/local/bin/mhsendmail; \
     chmod +x /usr/local/bin/mhsendmail; \
-    mkdir -p /tmp/argon2; \
-    cd /tmp/argon2; \
-    curl -o argon2.tar.gz -s https://codeload.github.com/P-H-C/phc-winner-argon2/tar.gz/20190702; \
-    tar --strip 1 -xf argon2.tar.gz; \
-    make -j$(nproc); \
-    make install PREFIX=/usr; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
+    mkdir -p /usr/src; \
+    cd /usr/src; \
+    curl -fsSL -o php.tar.xz "$PHP_URL"; \
     docker-php-source extract; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
     debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
@@ -60,38 +57,38 @@ RUN set -xe; \
         --with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
         --enable-option-checking=fatal \
         --disable-cgi \
+        --with-pdo-mysql=mysqlnd \
         --enable-mysqlnd \
+        --with-mhash \
         --enable-ftp \
         --enable-mbstring \
+        --with-curl \
+        --with-libedit \
+        --with-openssl \
+        --with-zlib \
         --enable-exif \
         --enable-bcmath \
         --enable-sockets \
-        --enable-gd=shared \
-        --with-pdo-mysql=mysqlnd \
-        --with-mhash \
-        --with-curl \
-        --with-libedit \
-        --enable-pcntl \
-        --with-openssl \
-        --with-zlib \
-        --with-zip \
-        --with-pear \
-        --with-tidy \
-        --with-sodium \
         --with-xsl \
-        --with-password-argon2 \
-        --with-freetype \
-        --with-jpeg \
-        --with-mysqli=mysqlnd \
-        --with-gmp \
+        --enable-pcntl \
+        --with-sodium \
+        --with-tidy \
+        --enable-gd \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
             ; \
     make -j "$(nproc)"; \
     make install; \
-    docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
-    docker-php-ext-enable opcache redis igbinary gd; \
+    mkdir -p /usr/src/php/ext/imagick; \
+    curl -fsSL https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
+    docker-php-ext-install imagick gd; \
+    curl -fsSL  https://github.com/FriendsOfPHP/pickle/releases/latest/download/pickle.phar -o pickle.phar; \
+    chmod +x pickle.phar; \
+    mv pickle.phar /usr/local/bin/pickle; \
+    pickle install redis; \
+    pickle install igbinary; \
+    docker-php-ext-enable opcache redis igbinary imagick gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
@@ -145,7 +142,6 @@ RUN set -xe; \
     cd /tmp/tideways; \
     docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
     tar --strip 2 -xzf tideways.tar.gz; \
-    ls -lisah; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
     docker-php-source delete; \
@@ -181,7 +177,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny python3 python3-distutils python3-pip"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
