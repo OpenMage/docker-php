@@ -88,6 +88,7 @@ RUN set -xe; \
     mv pickle.phar /usr/local/bin/pickle; \
     pickle install redis; \
     pickle install igbinary; \
+    pickle install xdebug; \
     docker-php-ext-enable opcache redis igbinary imagick gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
