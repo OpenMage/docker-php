@@ -74,6 +74,8 @@ RUN set -xe; \
         --with-sodium \
         --with-tidy \
         --enable-gd \
+        --with-jpeg \
+        --with-freetype \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
