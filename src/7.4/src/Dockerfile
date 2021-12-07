@@ -25,6 +25,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     IMAGICK_VERSION="3.5.1"
 
 ### configure php
+# hadolint ignore=DL4006,SC2039,DL3003
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
@@ -123,9 +124,10 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
 
 ## configure php extensions
+# hadolint ignore=DL4006,SC2086,DL3003
 RUN set -xe; \
     \
     ################################################
@@ -185,6 +187,7 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
+# hadolint ignore=DL4006
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \

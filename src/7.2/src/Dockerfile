@@ -24,6 +24,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz"
 
 ### configure php
+# hadolint ignore=DL4006,SC2039,DL3003
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
@@ -116,9 +117,10 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
 
 ## configure php extensions
+# hadolint ignore=DL4006,SC2086,DL3003
 RUN set -xe; \
     \
     ################################################
@@ -136,7 +138,7 @@ RUN set -xe; \
     ################################################
     mkdir -p /tmp/tideways; \
     cd /tmp/tideways; \
-    docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
+    docker-package-download -o tideways.tar.gz -s "https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz"; \
     tar --strip 2 -xzf tideways.tar.gz; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
@@ -178,6 +180,7 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
+# hadolint ignore=DL4006
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \

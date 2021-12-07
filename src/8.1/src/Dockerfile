@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.1"
+ARG PHP_VERSION="8.1.0"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -25,6 +25,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     IMAGICK_VERSION="3.5.1"
 
 ### configure php
+# hadolint ignore=DL4006,SC2039,DL3003
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
@@ -123,26 +124,29 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
 
 ## configure php extensions
+# hadolint ignore=DL4006,SC2086,DL3003
 RUN set -xe; \
     \
     ################################################
-    ## install newrelic
+    ## @ToDO: install newrelic when 8.1 compatible
+    ## - see https://github.com/newrelic/newrelic-php-agent/issues/258
     ################################################
-    mkdir -p /tmp/newrelic; \
-    cd /tmp/newrelic; \
-    curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
-    export NR_INSTALL_USE_CP_NOT_LN=1; \
-    export NR_INSTALL_SILENT=1; \
-    /tmp/newrelic-php5-*/newrelic-install install; \
-    rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
+    # mkdir -p /tmp/newrelic; \
+    # cd /tmp/newrelic; \
+    # curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
+    # export NR_INSTALL_USE_CP_NOT_LN=1; \
+    # export NR_INSTALL_SILENT=1; \
+    # /tmp/newrelic-php5-*/newrelic-install install; \
+    # rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
     ################################################
     ## install tideways
     ################################################
     mkdir -p /tmp/tideways; \
-    cd /tmp/tideways; \
+    cd \
+     /tmp/tideways; \
     docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
     tar --strip 2 -xzf tideways.tar.gz; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
@@ -185,6 +189,7 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
+# hadolint ignore=DL4006
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
