@@ -25,19 +25,20 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     IMAGICK_VERSION="3.5.1"
 
 ### configure php
+# hadolint ignore=DL4006,SC2039
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
     /usr/local/bin/docker-install-requirements php; \
     ln -fs /etc/alternatives/vi /usr/bin/vim; \
     mkdir -p /tmp/mhsendmail; \
-    cd /tmp/mhsendmail; \
+    WORKDIR /tmp/mhsendmail; \
     curl -LkSso /usr/local/bin/mhsendmail 'https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64'&& \
     chmod 0755 /usr/local/bin/mhsendmail; \
     chmod +x /usr/local/bin/mhsendmail; \
     mkdir -p "${PHP_INI_DIR}/conf.d"; \
     mkdir -p /usr/src; \
-    cd /usr/src; \
+    WORKDIR /usr/src; \
     curl -fsSL -o php.tar.xz "$PHP_URL"; \
     docker-php-source extract; \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
@@ -45,7 +46,7 @@ RUN set -xe; \
     if [[ ! -d "/usr/include/curl" ]]; then \
         ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
     fi; \
-    cd /usr/src/php; \
+    WORKDIR /usr/src/php; \
     export \
         CFLAGS="$PHP_CFLAGS" \
         CPPFLAGS="$PHP_CPPFLAGS" \
@@ -123,16 +124,17 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.20"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
 
 ## configure php extensions
+# hadolint ignore=DL4006,SC2086
 RUN set -xe; \
     \
     ################################################
     ## install newrelic
     ################################################
     mkdir -p /tmp/newrelic; \
-    cd /tmp/newrelic; \
+    WORKDIR /tmp/newrelic; \
     curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
     export NR_INSTALL_USE_CP_NOT_LN=1; \
     export NR_INSTALL_SILENT=1; \
@@ -142,7 +144,7 @@ RUN set -xe; \
     ## install tideways
     ################################################
     mkdir -p /tmp/tideways; \
-    cd /tmp/tideways; \
+    WORKDIR /tmp/tideways; \
     docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
     tar --strip 2 -xzf tideways.tar.gz; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
@@ -185,6 +187,7 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
+# hadolint ignore=DL4006
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
