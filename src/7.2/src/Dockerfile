@@ -117,7 +117,7 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.36"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003

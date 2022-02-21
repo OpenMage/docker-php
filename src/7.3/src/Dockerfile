@@ -2,7 +2,7 @@ FROM openmage/php-base:bullseye-latest AS php
 
 COPY FS /
 
-ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libfreetype6 libltdl7 libmcrypt4 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 cron vim.tiny"
+ARG PHP_RUNTIME_REQUIREMENTS="curl libcurl3-gnutls ca-certificates libedit2 libltdl7 libmcrypt4 libzip4 libfcgi-bin libtidy5deb1 libsodium23 cron vim.tiny"
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG PHP_BUILD_REQUIREMENTS="jq build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev gnupg2 argon2 libargon2-0 libargon2-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="7.3"
+ARG PHP_VERSION="7.3.32"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -85,6 +85,7 @@ RUN set -xe; \
     make -j "$(nproc)"; \
     make install; \
     docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
+    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
     docker-php-ext-enable opcache redis igbinary imagick gd; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
@@ -117,7 +118,7 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.36"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
