@@ -22,7 +22,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHPIZE_BUILD_REQUIREMENTS="build-essential automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libltdl-dev" \
     DOCUMENT_ROOT="/var/www/html" \
     PHP_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz" \
-    IMAGICK_VERSION="3.5.1"
+    IMAGICK_VERSION="3.7.0"
 
 ### configure php
 # hadolint ignore=DL4006,SC2039,DL3003
@@ -124,7 +124,7 @@ RUN set -xe; \
     /usr/local/bin/docker-layer-clean
 
 ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.28"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.36"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
