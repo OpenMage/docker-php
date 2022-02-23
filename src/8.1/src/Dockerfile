@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.1.0"
+ARG PHP_VERSION="8.1.2"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \

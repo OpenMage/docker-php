@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="imagick-3.4.4 xdebug-3.0.2 redis-5.3.2 igbinary-3.2.1
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="7.3.32"
+ARG PHP_VERSION="7.3.33"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -72,12 +72,12 @@ RUN set -xe; \
         --enable-sockets \
         --with-xsl \
         --enable-pcntl \
-        --with-gd=shared \
+        --with-gd \
         --with-sodium \
         --with-tidy \
-        --with-jpeg-dir=shared,/usr/include/ \
-        --with-webp-dir=/usr/include/ \
-        --with-png-dir=/usr/include/ \
+        --with-jpeg-dir \
+        --with-webp-dir \
+        --with-png-dir \
         ${PHP_CONFIGURE_ARGS:-} \
         ${PHP_CONFIGURE_ARGS_EXTRA:-} \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
@@ -85,8 +85,8 @@ RUN set -xe; \
     make -j "$(nproc)"; \
     make install; \
     docker-php-pecl-install "${PHP_PECL_REQUIREMENTS}"; \
-    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
-    docker-php-ext-enable opcache redis igbinary imagick gd; \
+    docker-php-ext-configure gd; \
+    docker-php-ext-enable opcache redis igbinary imagick; \
     docker-php-source delete; \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
