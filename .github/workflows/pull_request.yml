@@ -8,7 +8,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        version: ['7.2', '7.3', '7.4', '8.0']
+        version: ['7.4', '8.0', '8.1']
     runs-on: ubuntu-latest
     container: pipelinecomponents/hadolint:latest
     steps:

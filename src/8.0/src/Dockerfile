@@ -123,8 +123,8 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.36"
+ARG PHP_EXT_NEWRELIC_VERSION="9.20.0.310"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.40"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
