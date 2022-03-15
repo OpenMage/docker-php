@@ -123,8 +123,8 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_NEWRELIC_VERSION="9.18.1.303"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.36"
+ARG PHP_EXT_NEWRELIC_VERSION="9.20.0.310"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.40"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
@@ -134,13 +134,13 @@ RUN set -xe; \
     ## @ToDO: install newrelic when 8.1 compatible
     ## - see https://github.com/newrelic/newrelic-php-agent/issues/258
     ################################################
-    # mkdir -p /tmp/newrelic; \
-    # cd /tmp/newrelic; \
-    # curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
-    # export NR_INSTALL_USE_CP_NOT_LN=1; \
-    # export NR_INSTALL_SILENT=1; \
-    # /tmp/newrelic-php5-*/newrelic-install install; \
-    # rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
+    mkdir -p /tmp/newrelic; \
+    cd /tmp/newrelic; \
+    curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
+    export NR_INSTALL_USE_CP_NOT_LN=1; \
+    export NR_INSTALL_SILENT=1; \
+    /tmp/newrelic-php5-*/newrelic-install install; \
+    rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
     ################################################
     ## install tideways
     ################################################
