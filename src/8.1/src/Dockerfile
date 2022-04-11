@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.1.2"
+ARG PHP_VERSION="8.1.3"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -131,7 +131,6 @@ ARG PHP_EXT_TIDEWAYS_VERSION="5.4.40"
 RUN set -xe; \
     \
     ################################################
-    ## @ToDO: install newrelic when 8.1 compatible
     ## - see https://github.com/newrelic/newrelic-php-agent/issues/258
     ################################################
     mkdir -p /tmp/newrelic; \

@@ -149,7 +149,7 @@ RUN set -xe; \
     tar --strip 2 -xzf tideways.tar.gz; \
     cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
     ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
-    docker-php-source delete; \
+    rm -rf /tmp/tideways; \
     ################################################
     ## install Composer 2 as default
     ################################################
