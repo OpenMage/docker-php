@@ -133,13 +133,13 @@ RUN set -xe; \
     ################################################
     ## - see https://github.com/newrelic/newrelic-php-agent/issues/258
     ################################################
-    mkdir -p /tmp/newrelic; \
-    cd /tmp/newrelic; \
-    curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
-    export NR_INSTALL_USE_CP_NOT_LN=1; \
-    export NR_INSTALL_SILENT=1; \
-    /tmp/newrelic-php5-*/newrelic-install install; \
-    rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
+    # mkdir -p /tmp/newrelic; \
+    # cd /tmp/newrelic; \
+    # curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
+    # export NR_INSTALL_USE_CP_NOT_LN=1; \
+    # export NR_INSTALL_SILENT=1; \
+    # ./tmp/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux/newrelic-install install; \
+    # rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
     ################################################
     ## install tideways
     ################################################
