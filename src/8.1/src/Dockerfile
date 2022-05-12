@@ -174,9 +174,8 @@ RUN set -xe; \
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun2 https://files.magerun.net/n98-magerun2.phar; \
     chmod +x /usr/local/bin/magerun2; \
-    /usr/local/bin/docker-layer-clean
-
-RUN echo -e "\nalias dep='www/html/vendor/bin/deployer.phar'" >> ~/.bashrc
+    /usr/local/bin/docker-layer-clean; \
+    echo -e "\nalias dep='www/html/vendor/bin/deployer.phar'" >> ~/.bashrc
 
 WORKDIR /var/www/html
 ENTRYPOINT ["docker-entrypoint"]
