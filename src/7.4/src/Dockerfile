@@ -123,33 +123,13 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_NEWRELIC_VERSION="9.20.0.310"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.40"
+ARG PHP_EXT_NEWRELIC_VERSION="9.21.0.311"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.42"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
 RUN set -xe; \
     \
-    ################################################
-    ## install newrelic
-    ################################################
-    # mkdir -p /tmp/newrelic; \
-    # cd /tmp/newrelic; \
-    # curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
-    # export NR_INSTALL_USE_CP_NOT_LN=1; \
-    # export NR_INSTALL_SILENT=1; \
-    # ./tmp/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux/newrelic-install install; \
-    # rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
-    ################################################
-    ## install tideways
-    ################################################
-    mkdir -p /tmp/tideways; \
-    cd /tmp/tideways; \
-    docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
-    tar --strip 2 -xzf tideways.tar.gz; \
-    cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
-    ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
-    rm -rf /tmp/tideways; \
     ################################################
     ## install Composer 2 as default
     ################################################
