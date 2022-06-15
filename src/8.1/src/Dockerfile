@@ -82,10 +82,7 @@ RUN set -xe; \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
             ; \
     make -j "$(nproc)"; \
-    make install;
-
-RUN set -xe; \
-        \
+    make install; \
     mkdir -p /usr/src/php/ext/imagick; \
     curl -fsSL https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
     docker-php-ext-install imagick gd zip; \
@@ -156,10 +153,7 @@ RUN set -xe; \
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun2 https://files.magerun.net/n98-magerun2.phar; \
     chmod +x /usr/local/bin/magerun2; \
-    /usr/local/bin/docker-layer-clean;
-
-RUN set -xe; \
-        \
+    /usr/local/bin/docker-layer-clean; \
     echo "alias dep='vendor/bin/deployer.phar'" >> ~/.bashrc; \
     echo "alias dep='vendor/bin/deployer.phar'" >> /home/www-data/.bashrc
 
@@ -180,9 +174,6 @@ RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
     curl https://rclone.org/install.sh | bash; \
-
-RUN set -xe; \
-    \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
