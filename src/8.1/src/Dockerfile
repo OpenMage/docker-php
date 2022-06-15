@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.1.4"
+ARG PHP_VERSION="8.1.6"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -82,7 +82,10 @@ RUN set -xe; \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
             ; \
     make -j "$(nproc)"; \
-    make install; \
+    make install;
+
+RUN set -xe; \
+        \
     mkdir -p /usr/src/php/ext/imagick; \
     curl -fsSL https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
     docker-php-ext-install imagick gd zip; \
@@ -123,34 +126,13 @@ RUN set -xe; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
 
-ARG PHP_EXT_NEWRELIC_VERSION="9.20.0.310"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.40"
+ARG PHP_EXT_NEWRELIC_VERSION="9.21.0.311"
+ARG PHP_EXT_TIDEWAYS_VERSION="5.4.42"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
 RUN set -xe; \
     \
-    ################################################
-    ## - see https://github.com/newrelic/newrelic-php-agent/issues/258
-    ################################################
-    # mkdir -p /tmp/newrelic; \
-    # cd /tmp/newrelic; \
-    # curl -L "https://download.newrelic.com/php_agent/release/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux.tar.gz" | tar -C /tmp -zx; \
-    # export NR_INSTALL_USE_CP_NOT_LN=1; \
-    # export NR_INSTALL_SILENT=1; \
-    # ./tmp/newrelic-php5-${PHP_EXT_NEWRELIC_VERSION}-linux/newrelic-install install; \
-    # rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*; \
-    ################################################
-    ## install tideways
-    ################################################
-    mkdir -p /tmp/tideways; \
-    cd \
-     /tmp/tideways; \
-    docker-package-download -o tideways.tar.gz -s https://s3-eu-west-1.amazonaws.com/tideways/extension/${PHP_EXT_TIDEWAYS_VERSION}/tideways-php-${PHP_EXT_TIDEWAYS_VERSION}-x86_64.tar.gz; \
-    tar --strip 2 -xzf tideways.tar.gz; \
-    cp "tideways-php-$(php -r \@phpinfo\(\)\; | grep 'PHP Version' -m 1 | grep -oE '([0-9\.]+)' | cut -d. -f1,2).so" "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
-    ls -lisah "$(/usr/local/bin/php-config --extension-dir)/tideways.so"; \
-    docker-php-source delete; \
     ################################################
     ## install Composer 2 as default
     ################################################
@@ -174,7 +156,10 @@ RUN set -xe; \
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun2 https://files.magerun.net/n98-magerun2.phar; \
     chmod +x /usr/local/bin/magerun2; \
-    /usr/local/bin/docker-layer-clean; \
+    /usr/local/bin/docker-layer-clean;
+
+RUN set -xe; \
+        \
     echo "alias dep='vendor/bin/deployer.phar'" >> ~/.bashrc; \
     echo "alias dep='vendor/bin/deployer.phar'" >> /home/www-data/.bashrc
 
@@ -195,6 +180,9 @@ RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
     curl https://rclone.org/install.sh | bash; \
+
+RUN set -xe; \
+    \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
