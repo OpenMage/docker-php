@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="7.4.29"
+ARG PHP_VERSION="7.4.30"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -122,9 +122,6 @@ RUN set -xe; \
         echo 'pm.status_path = /status'; \
     } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
     /usr/local/bin/docker-layer-clean
-
-ARG PHP_EXT_NEWRELIC_VERSION="9.21.0.311"
-ARG PHP_EXT_TIDEWAYS_VERSION="5.4.42"
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003

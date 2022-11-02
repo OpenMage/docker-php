@@ -8,7 +8,7 @@ on:
       - 'src/8.1/**'
       - '.github/workflows/php-8.1.yml'
   schedule:
-    - cron:  '30 1 1,15 * *'
+    - cron:  '00 6 * * 1'
 
 jobs:
 
@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         version: ['8.1']
-        patchVersion: [5,6,7,8,9]
+        patchVersion: [7,8,9,10,11]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
