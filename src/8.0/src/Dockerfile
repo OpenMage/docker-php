@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.0.24"
+ARG PHP_VERSION="8.0.26"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -130,7 +130,7 @@ RUN set -xe; \
     ################################################
     ## install Composer 2 as default
     ################################################
-    COMPOSER_DOWNLOAD_LATEST=$(curl -s https://api.github.com/repos/composer/composer/releases/latest | grep "browser_download_url.*phar" | cut -d '"' -f 4) ; \
+    COMPOSER_DOWNLOAD_LATEST=$(curl -s https://api.github.com/repos/composer/composer/releases/latest | jq --raw-output '.assets[] | .browser_download_url' | head -n 1) ; \
     docker-package-download -o /usr/local/bin/composer ${COMPOSER_DOWNLOAD_LATEST}; \
     chmod +x /usr/local/bin/composer; \
     composer selfupdate; \
