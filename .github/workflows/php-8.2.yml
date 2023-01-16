@@ -1,22 +1,23 @@
-name: "7.4"
+name: "8.1"
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - 'src/7.4/**'
-      - '.github/workflows/php-7.4.yml'
+      - 'src/8.2/**'
+      - '.github/workflows/php-8.2.yml'
   schedule:
-    - cron:  '00 4 * * 1'
+    - cron:  '00 7 * * 1'
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [7.4]
-        patchVersion: [29,30,31,32,33]
+        version: ['8.2']
+        patchVersion: [0]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,7 +42,7 @@ jobs:
           file: ./src/${{ matrix.version }}/src/Dockerfile
           target: php
           build-args: |
-           PHP_VERSION=${{ matrix.version }}.${{ matrix.patchVersion }}
+            PHP_VERSION=${{ matrix.version }}.${{ matrix.patchVersion }}
       - name: Build toolbox image
         uses: docker/build-push-action@v2
         with:
