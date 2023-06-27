@@ -1,4 +1,4 @@
-FROM openmage/php-base:bullseye-latest AS php
+FROM openmage/php-base:bookworm-latest AS php
 
 COPY FS /
 
