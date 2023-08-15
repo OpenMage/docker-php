@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.0.28"
+ARG PHP_VERSION="8.0.29"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -150,9 +150,7 @@ RUN set -xe; \
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun2 https://files.magerun.net/n98-magerun2.phar; \
     chmod +x /usr/local/bin/magerun2; \
-    /usr/local/bin/docker-layer-clean; \
-    echo "alias dep='vendor/bin/deployer.phar'" >> ~/.bashrc; \
-    echo "alias dep='vendor/bin/deployer.phar'" >> /home/www-data/.bashrc
+    /usr/local/bin/docker-layer-clean
 
 WORKDIR /var/www/html
 ENTRYPOINT ["docker-entrypoint"]
@@ -165,6 +163,12 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-to
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
+
+RUN set -xe; \
+    \
+    composer global require deployer/deployer; \
+    composer global update; \
+    echo "export PATH=$PATH:~/.composer/vendor/bin" >> ~/.bashrc && source ~/.bashrc
 
 # hadolint ignore=DL4006
 RUN set -xe; \

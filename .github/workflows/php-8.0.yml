@@ -11,13 +11,12 @@ on:
     - cron:  '00 5 * * 1'
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         version: ['8.0']
-        patchVersion: [24,25,26,27,28]
+        patchVersion: [25,26,27,28,29]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
