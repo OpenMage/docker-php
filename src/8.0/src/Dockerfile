@@ -168,7 +168,7 @@ RUN set -xe; \
     \
     composer global require deployer/deployer; \
     composer global update; \
-    echo "export PATH=$PATH:~/.composer/vendor/bin" >> ~/.bashrc && . ~/.bashrc
+    ln -s ~/.composer/vendor/bin/dep /usr/local/bin/dep
 
 # hadolint ignore=DL4006
 RUN set -xe; \
