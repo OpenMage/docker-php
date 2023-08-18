@@ -164,17 +164,14 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
-RUN set -xe; \
-    \
-    composer global require deployer/deployer; \
-    composer global update; \
-    ln -s ~/.composer/vendor/bin/dep /usr/local/bin/dep
-
 # hadolint ignore=DL4006
 RUN set -xe; \
     \
     /usr/local/bin/docker-install-requirements toolbox; \
     curl https://rclone.org/install.sh | bash; \
+    composer require deployer/deployer; \
+    composer update; \
+    echo "export PATH=$PATH:/var/www/html/vendor/bin" >> /etc/profile; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
