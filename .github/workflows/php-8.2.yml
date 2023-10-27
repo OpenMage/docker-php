@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         version: ['8.2']
-        patchVersion: [6,7,8,9,10]
+        patchVersion: [7,8,9,10,11]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
