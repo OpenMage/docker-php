@@ -1,22 +1,22 @@
-name: "8.0"
+name: "8.2"
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - 'src/8.0/**'
-      - '.github/workflows/php-8.0.yml'
+      - 'src/8.2/**'
+      - '.github/workflows/php-8.2.yml'
   schedule:
-    - cron:  '00 5 * * 1'
+    - cron:  '00 7 * * 1'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ['8.0']
-        patchVersion: [26,27,28,29,30]
+        version: ['8.3']
+        patchVersion: [0]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
