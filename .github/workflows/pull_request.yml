@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: pipelinecomponents/hadolint:latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: hadolint/hadolint-action@v1.5.0
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: ./src/${{ matrix.version }}/src/Dockerfile
