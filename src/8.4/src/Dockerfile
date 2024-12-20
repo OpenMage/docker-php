@@ -10,7 +10,7 @@ ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
 ARG PHP_CONFIGURE_ARGS_EXTRA=""
 ARG PHP_CONFIGURE_ARGS_FPM="--enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data"
-ARG PHP_VERSION="8.2.26"
+ARG PHP_VERSION="8.4.1"
 
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     PHP_CPPFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
@@ -82,7 +82,9 @@ RUN set -xe; \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
             ; \
     make -j "$(nproc)"; \
-    make install; \
+    make install;
+RUN set -xe; \
+    \
     mkdir -p /usr/src/php/ext/imagick; \
     curl -fsSL https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
     docker-php-ext-install imagick gd zip; \
@@ -93,7 +95,9 @@ RUN set -xe; \
     pickle install igbinary; \
     pickle install xdebug; \
     docker-php-ext-enable opcache redis igbinary imagick gd; \
-    docker-php-source delete; \
+    docker-php-source delete;
+RUN set -xe; \
+    \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
     cp /usr/local/etc/php-fpm.d/www.conf.default /usr/local/etc/php-fpm.d/www.conf; \
