@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'src/8.2/**'
-      - '.github/workflows/php-8.2.yml'
+      - 'src/8.3/**'
+      - '.github/workflows/php-8.3.yml'
   schedule:
     - cron:  '00 7 * * 1'
 

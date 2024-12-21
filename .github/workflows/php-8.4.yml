@@ -1,12 +1,12 @@
-name: "8.3"
+name: "8.4"
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - 'src/8.2/**'
-      - '.github/workflows/php-8.2.yml'
+      - 'src/8.4/**'
+      - '.github/workflows/php-8.4.yml'
   schedule:
     - cron:  '00 7 * * 1'
 
