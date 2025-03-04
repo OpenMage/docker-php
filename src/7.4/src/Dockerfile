@@ -1,10 +1,10 @@
-FROM openmage/php-base:bullseye-latest AS php
+FROM openmage/php-base:bookworm-latest AS php
 
 COPY FS /
 
-ARG PHP_RUNTIME_REQUIREMENTS="jq curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 zip libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny php-xdebug zip"
+ARG PHP_RUNTIME_REQUIREMENTS="jq curl libcurl3-gnutls ca-certificates libedit2 libgmp-dev libfreetype6 libltdl7 libmcrypt4 sqlite3 libpng16-16 libzip4 libfcgi-bin libtidy5deb1 libsodium23 libonig5 cron vim.tiny php-xdebug zip"
 ARG PHP_RUNTIME_REQUIREMENTS_EXTRA=""
-ARG PHP_BUILD_REQUIREMENTS="build-essential dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev gnupg2 argon2 libargon2-0 libargon2-dev libzip-dev"
+ARG PHP_BUILD_REQUIREMENTS="build-essential curl dpkg-dev automake autoconf libtool file g++ gcc libc-dev make pkg-config re2c libxml2-dev libcurl4-gnutls-dev libtidy-dev libsqlite3-dev libssl-dev libxml2-dev zlib1g-dev libpng-dev liblzf-dev libreadline6-dev libfreetype6-dev libmcrypt-dev libedit-dev  libltdl-dev libxslt-dev libzip-dev libsodium-dev libonig-dev gnupg2 argon2 libargon2-0 libargon2-dev libzip-dev"
 ARG PHP_BUILD_REQUIREMENTS_EXTRA=""
 ARG PHP_PECL_REQUIREMENTS="redis igbinary"
 ARG PHP_CONFIGURE_ARGS="--enable-soap --enable-intl"
@@ -25,6 +25,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
     IMAGICK_VERSION="3.7.0"
 
 ### configure php
+# hadolint ignore=DL4006,SC2039,DL3003
 # hadolint ignore=DL4006,SC2039,DL3003
 RUN set -xe; \
     \
@@ -82,18 +83,28 @@ RUN set -xe; \
         ${PHP_CONFIGURE_ARGS_FPM:-} \
             ; \
     make -j "$(nproc)"; \
-    make install; \
-    mkdir -p /usr/src/php/ext/imagick; \
-    curl -fsSL https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
-    docker-php-ext-install imagick gd zip; \
+    make install;
+RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz \
+    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && rm -rf /tmp/*
+RUN set -xe; \
+    \
+    docker-php-ext-install gd zip; \
     curl -fsSL  https://github.com/FriendsOfPHP/pickle/releases/latest/download/pickle.phar -o pickle.phar; \
     chmod +x pickle.phar; \
     mv pickle.phar /usr/local/bin/pickle; \
     pickle install redis; \
     pickle install igbinary; \
-    pickle install xdebug@3.1.5; \
-    docker-php-ext-enable opcache redis igbinary imagick gd; \
-    docker-php-source delete; \
+    pickle install xdebug; \
+    docker-php-ext-enable imagick opcache redis imagick igbinary gd; \
+    docker-php-source delete;
+RUN set -xe; \
+    \
     # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
     sed 's!=NONE/!=!g' /usr/local/etc/php-fpm.conf.default | tee /usr/local/etc/php-fpm.conf > /dev/null; \
     cp /usr/local/etc/php-fpm.d/www.conf.default /usr/local/etc/php-fpm.d/www.conf; \
@@ -120,8 +131,7 @@ RUN set -xe; \
         echo 'pm.min_spare_servers = 2'; \
         echo 'pm.max_spare_servers = 5'; \
         echo 'pm.status_path = /status'; \
-    } | tee /usr/local/etc/php-fpm.d/zz-docker.conf; \
-    /usr/local/bin/docker-layer-clean
+    } | tee /usr/local/etc/php-fpm.d/zz-docker.conf;
 
 ## configure php extensions
 # hadolint ignore=DL4006,SC2086,DL3003
@@ -133,24 +143,30 @@ RUN set -xe; \
     COMPOSER_DOWNLOAD_LATEST=$(curl -s https://api.github.com/repos/composer/composer/releases/latest | jq --raw-output '.assets[] | .browser_download_url' | head -n 1) ; \
     docker-package-download -o /usr/local/bin/composer ${COMPOSER_DOWNLOAD_LATEST}; \
     chmod +x /usr/local/bin/composer; \
-    composer selfupdate; \
+    composer selfupdate;
+RUN set -xe; \
+    \
     ################################################
     ## install Composer 1
     ################################################
     docker-package-download -o /usr/local/bin/composer1 https://getcomposer.org/composer-1.phar; \
     chmod +x /usr/local/bin/composer1; \
-    composer1 selfupdate; \
+    composer1 selfupdate;
+RUN set -xe; \
+    \
     ################################################
     ## install magerun
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun https://files.magerun.net/n98-magerun.phar; \
-    chmod +x /usr/local/bin/magerun; \
+    chmod +x /usr/local/bin/magerun;
+RUN set -xe; \
+    \
     ################################################
     ## install magerun2
     ################################################
     curl -s -f -L -o /usr/local/bin/magerun2 https://files.magerun.net/n98-magerun2.phar; \
     chmod +x /usr/local/bin/magerun2; \
-    /usr/local/bin/docker-layer-clean
+    /usr/local/bin/docker-layer-clean;
 
 WORKDIR /var/www/html
 ENTRYPOINT ["docker-entrypoint"]
