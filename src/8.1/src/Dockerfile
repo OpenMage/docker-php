@@ -26,28 +26,34 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
 
 ### configure php
 # hadolint ignore=DL4006,SC2039,DL3003
-# hadolint ignore=DL4006,SC2039,DL3003
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
     /usr/local/bin/docker-install-requirements php; \
     ln -fs /etc/alternatives/vi /usr/bin/vim; \
     mkdir -p /tmp/mhsendmail; \
-    cd /tmp/mhsendmail; \
+    mkdir -p "${PHP_INI_DIR}/conf.d"; \
+    mkdir -p /usr/src;
+WORKDIR /tmp/mhsendmail
+RUN set -xe; \
+    \
     curl -LkSso /usr/local/bin/mhsendmail 'https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64'&& \
     chmod 0755 /usr/local/bin/mhsendmail; \
     chmod +x /usr/local/bin/mhsendmail; \
-    mkdir -p "${PHP_INI_DIR}/conf.d"; \
-    mkdir -p /usr/src; \
-    cd /usr/src; \
+WORKDIR /usr/src
+RUN set -xe; \
+    \
     curl -fsSL -o php.tar.xz "$PHP_URL"; \
-    docker-php-source extract; \
+    docker-php-source extract;
+WORKDIR /usr/src/php
+RUN set -xe; \
+    \
     gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
     debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
     if [ ! -d "/usr/include/curl" ]; then \
         ln -sT "/usr/include/${debMultiarch}/curl" /usr/local/include/curl; \
     fi; \
-    cd /usr/src/php; \
     export \
         CFLAGS="$PHP_CFLAGS" \
         CPPFLAGS="$PHP_CPPFLAGS" \
@@ -180,10 +186,9 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
-# hadolint ignore=DL4006
-RUN set -xe; \
-    \
-    /usr/local/bin/docker-install-requirements toolbox; \
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
+RUN /usr/local/bin/docker-install-requirements toolbox; \
     curl https://rclone.org/install.sh | bash; \
     composer require deployer/deployer; \
     composer update; \
