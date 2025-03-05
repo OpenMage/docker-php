@@ -26,7 +26,7 @@ ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2" \
 
 ### configure php
 # hadolint ignore=DL4006,SC2039,DL3003
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 RUN set -xe; \
     \
     chmod 755 /usr/local/bin/docker-entrypoint; \
@@ -186,7 +186,7 @@ ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
 RUN /usr/local/bin/docker-install-requirements toolbox; \
     curl https://rclone.org/install.sh | bash; \
