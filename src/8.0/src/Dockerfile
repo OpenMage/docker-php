@@ -40,7 +40,7 @@ RUN set -xe; \
     \
     curl -LkSso /usr/local/bin/mhsendmail 'https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64'&& \
     chmod 0755 /usr/local/bin/mhsendmail; \
-    chmod +x /usr/local/bin/mhsendmail; \
+    chmod +x /usr/local/bin/mhsendmail;
 WORKDIR /usr/src
 RUN set -xe; \
     \
