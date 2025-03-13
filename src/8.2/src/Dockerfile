@@ -181,7 +181,7 @@ EXPOSE 9000
 
 FROM php AS toolbox
 
-ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny"
+ARG TOOLBOX_RUNTIME_REQUIREMENTS="curl git redis-tools mariadb-client percona-toolkit rsync openssh-client vim.tiny php-xdebug"
 ARG TOOLBOX_RUNTIME_REQUIREMENTS_EXTRA=""
 ARG TOOLBOX_BUILD_REQUIREMENTS=""
 ARG TOOLBOX_BUILD_REQUIREMENTS_EXTRA=""
@@ -193,6 +193,7 @@ RUN /usr/local/bin/docker-install-requirements toolbox; \
     composer require deployer/deployer; \
     composer update; \
     echo "export PATH=$PATH:/var/www/html/vendor/bin" >> /etc/profile; \
+    echo "xdebug.mode=coverage" > /usr/local/etc/php/conf.d/xdebug-coverage.ini; \
     /usr/local/bin/docker-layer-clean
 
 CMD ["php", "-a"]
