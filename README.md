@@ -1,19 +1,21 @@
-# OpenMage PHP Container
+# ⚠️ DEPRECATED - This repository has been archived
 
-# PHP Releases:
-https://www.php.net/releases/
+This project has been moved to [wilma-digital/docker-php](https://github.com/wilma-digital/docker-php).
 
-# Tideways Releases:
-https://tideways.com/profiler/downloads
+**New Docker Hub namespace**: `wilmadigital/docker-php`
 
-# Imagick Releases:
-https://github.com/Imagick/imagick/tags
+## Migration
 
-# NewRelic PHP Releases:
-https://github.com/newrelic/newrelic-php-agent/releases
+Old images will remain available but will no longer receive updates.
 
-# Sample building for testing:
-docker build -f src/7.4/src/Dockerfile -t docker.io/openmage/php:8.3.6 src/8.3/src/
+Please update your projects to use the new namespace:
 
-# Sample building for multi arch testing and push to docker hub:
-cd src/8.3/src &&  docker buildx create --use &&  docker buildx build --progress=plain --platform linux/amd64,linux/arm64 --push -t docker.io/openmage/php:8.3.0 .
+```yaml
+# Old
+FROM openmage/php:8.5.3
+
+# New
+FROM wilmadigital/php:8.5.3
+```
+
+For migration assistance, see: https://github.com/wilma-digital/docker-php/blob/main/MIGRATION.md
